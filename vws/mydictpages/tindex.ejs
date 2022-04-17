@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="public/assets/css/mystyles.css"> 
+    <script type = "text/javascript"  src="public/assets/js/minajax.js"></script>
+    <!-- <script type = "text/javascript"  src= 'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js'></script> -->
+    <title>MY Dictionary</title>
+</head>
+
+<body>
+
+    <header>
+       
+    </header>
+
+    
+    <h2> <%= spinfo.info %> </h2>
+    <div class = "container">
+        <div id = "alerts" ></div>
+        <form action="/redmysubmit" method = "post">
+            <span><button class = "wbut" style = "display: none;" id = "mywordbut" type = "submit">SUBMIT </button></span>
+        </form>
+          
+            
+            
+        <div >
+            <input type="text" id = "wrd" class = "worder" autocomplete="nofill" placeholder="WORD" onkeyup="myontextsubmit(event)">
+        </div>
+       
+        <div class = "mean">
+            <label for="mean" id =  "mean"></label> 
+            
+        </div>
+            <table id = "tbl">
+                <th><%= spinfo.tf %> </th>
+            </table>
+        
+    </div>
+</body>
+<script>
+
+    function try_mysubmit (event){
+        var fword= document.getElementById("wrd");
+        var text1 = fword.value;
+     
+        if(text1 == ""){
+            erralert("Enter the value first");
+        }
+        else {
+
+        $.ajax({
+            url:"/mysubmit", type : "POST", 
+            data : {
+               word : text1
+            },
+            dataType : "json",
+            success : function(result){
+                if(result.length > 0){
+                    document.getElementById("tbl").innerHTML = "<th>Meaning</th>"
+                for ( i = 0; i < result.length; i++){
+                    var mean = result[i];
+                        //document.getElementById("mean").innerHTML = mean.meaning;
+                        document.getElementById("mean").innerHTML = "";
+                        document.getElementById("tbl").innerHTML+= "<tr> <hr> <td>" + mean.meaning + "</td> </tr>"  
+                }
+            }
+            else{
+                document.getElementById("tbl").innerHTML = "<th>NoT EXIST</th>"
+            }
+    
+    
+            }
+            
+        })
+        location.replace("view2/redirmean.html");
+    }
+
+    }
+    
+    function mysubmit (event){
+        var fword= document.getElementById("wrd");
+        var text1 = fword.value;
+     
+        if(text1 == ""){
+            console.log("yhid")
+            erralert("Enter the value first");
+        }
+        else {
+
+        $.ajax({
+            url:"/redmysubmit", type : "POST", 
+            data : {
+               word : text1
+            },
+            dataType : "json",
+            success : function(result){
+                    console.log(result)
+            }
+            
+        })
+        location.replace("view2/redirmean.html");
+    }
+
+}
+    function myontextsubmit (event){
+        
+        var fword= document.getElementById("wrd");
+        var text1 = fword.value;
+     
+        if(text1 == ""){
+             fword.focus();
+
+        }
+
+        var butid =  document.getElementById("mywordbut");
+
+         $.ajax({
+             
+            url:"/mykeyupsubmit", type : "GET", 
+            contentType: "application/json",
+            data : {word : text1},
+            
+            success : function(result){
+                var jresult = JSON.parse(result) ;                
+                if(jresult.length > 0){
+                    butid.style = "display:none;"
+                    document.getElementById("tbl").innerHTML = "<th style = 'color : yellow; font-size : 1.2 em; color: rgb(10, 10, 250); '>Meaning</th>"
+                for (var k in result){
+                    var prsd =  JSON.parse(result);
+                    var mean = prsd[k];
+                    if(mean != undefined){
+                        document.getElementById("mean").innerHTML = "";
+                        document.getElementById("tbl").innerHTML+= "<tr style = 'text-align : center;'> <hr> <td style = 'text-align : center;'>" + mean.meaning + "</td> </tr>" 
+                    }
+                }
+            }
+            else{
+        
+                document.getElementById("tbl").innerHTML = "<th>NoT EXIST</th>"
+
+                butid.style = "display:block;"
+                butid.innerHTML = "Add Word"
+            }
+
+            }
+            
+        }) 
+        
+
+        
+
+    }
+    function erralert(gmsg){
+        console.log("jklmno")
+        $("#alerts").append(
+            '<div class = "myinfoalert">' + gmsg+
+            '<span class = "errspan" onclick = "onerrclick()">&times;</span></div>'
+        );
+
+    }
+    function onerrclick(){
+        var close = document.getElementsByClassName("myinfoalert");
+        var i ;
+        console.log(close);
+        for(i = 0; i < close.length; i++){
+            console.log(i);
+            close[i].onclick = function(){
+                var div  = this.parentElement;
+                div.style.opacity = "0";
+                setTimeout(function(){div.style.display = "none";},600);
+            }
+        }
+    }
+</script>
+</html>

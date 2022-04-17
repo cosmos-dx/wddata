@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   
+    <link rel="stylesheet" href="public/assets/css/mystyles.css"> 
+    <script type = "text/javascript"  src="public/assets/js/minajax.js"></script>
+   
+
+    <title> <%= spinfo.title %> </title>
+</head>
+<body>
+    <h3>  </h3>
+    <div class = "container"> <p>  </p>  
+        <form action="/backto", method = "post">
+        <span><button class = "wbut"> BACK </button></span>
+        </form>
+        
+        <form action="/wordsave" method = "post" id = "frustform" enctype= "application/x-www-form-urlencoded">
+
+        <fieldset>
+            <span><button class = "wbut" type = "submit"   onclick="mysubmit(event)"> SAVE </button></span>
+            <input type="text" name = "savemeaning"id = "wrd" class = "worder" autocomplete="nofill" placeholder="MEANING">
+        </fieldset>
+
+         </form>
+        <div class = "wrdlbldiv">
+            <label for="wordid" id = "showwrd" class = "wrdlbl"><%= spinfo.word %> </label>
+       
+        </div>
+        
+          
+        <div class = "mean">
+            <label for="mean" id =  "mean"></label> 
+            
+        </div>
+            <table id = "tbl">
+            </table>
+        
+    </div>
+</body>
+<script>
+
+    function mysubmit (event){
+        var fword= document.getElementById("wrd");
+        var text1 = fword.value;
+     
+        if(text1 == ""){
+             fword.focus();
+        }
+        else{
+
+        $.ajax({
+            url:"/mymeansubmit", type : "POST", 
+            data : {
+               word : text1
+            },
+            dataType : "json",
+            success : function(result){
+                if(result.length > 0){
+                    document.getElementById("tbl").innerHTML = "<th>Meaning</th>"
+                for ( i = 0; i < result.length; i++){
+                    var mean = result[i];
+                        //document.getElementById("mean").innerHTML = mean.meaning;
+                        document.getElementById("mean").innerHTML = "";
+                        document.getElementById("tbl").innerHTML+= "<tr> <hr> <td>" + mean.meaning + "</td> </tr>"  
+                }
+            }
+            else{
+                document.getElementById("tbl").innerHTML = "<th>NoT EXIST</th>"
+            }
+    
+    
+            }
+            
+        })
+        location.replace("index.html");
+    }
+
+    }
+            
+</script>
+</html>
